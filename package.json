@@ -7,9 +7,12 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
-    "hono": "^4.10.4"
+    "hono": "^4.10.4",
+    "lru-cache": "^11.2.2",
+    "unsplash-js": "^7.0.20"
   },
   "devDependencies": {
+    "@types/node": "^24.10.0",
     "wrangler": "^4.46.0"
   }
 }

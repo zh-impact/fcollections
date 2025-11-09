@@ -36,11 +36,11 @@ app.get("/message", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.get("/cover", async (c) => {
+app.get("/cover", (c) => {
   const url = new URL(c.req.url);
   console.log(c.req.url, url);
   url.pathname = "/cover.png";
-  return await c.env.ASSETS.fetch(
+  return c.env.ASSETS.fetch(
     new Request(url.toString(), { method: "GET" })
   );
 });
@@ -52,7 +52,7 @@ app.get("/random/picture", async (c) => {
 
     const targetPicture = data.urls.regular;
     console.log(targetPicture);
-    return await fetch(targetPicture);
+    return fetch(targetPicture);
   }
 
   const api = "https://api.unsplash.com/photos/random";
@@ -69,7 +69,7 @@ app.get("/random/picture", async (c) => {
 
   const targetPicture = data.urls.regular;
   console.log(targetPicture);
-  return await fetch(targetPicture);
+  return fetch(targetPicture);
 });
 
 export default app;

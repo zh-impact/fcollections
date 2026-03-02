@@ -32,18 +32,21 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use(cache({ cacheName: 'fcollections', cacheControl: 'max-age=60' }))
 app.use(prettyJSON())
 
-app.get('/message', (c) => {
+// API routes with /api prefix
+const api = new Hono<{ Bindings: Bindings }>()
+
+api.get('/message', (c) => {
   return c.text('Hello Hono!')
 })
 
-app.get('/cover', (c) => {
+api.get('/cover', (c) => {
   const url = new URL(c.req.url)
   console.log(c.req.url, url)
   url.pathname = '/cover.png'
   return c.env.ASSETS.fetch(new Request(url.toString(), { method: 'GET' }))
 })
 
-app.get('/random/picture', async (c) => {
+api.get('/random/picture', async (c) => {
   if (lruCache.has('random/picture')) {
     console.log('Cache hit')
     const data = lruCache.get('random/picture') as Random
@@ -62,12 +65,27 @@ app.get('/random/picture', async (c) => {
   })
   console.log(response.headers)
   const data = (await response.json()) as Random
-  lruCache.set('random/picture', data as unknown)
+  lruCache.set('random/picture', data as unknown as {})
   console.log('Cache miss', data.urls)
 
   const targetPicture = data.urls.regular
   console.log(targetPicture)
   return fetch(targetPicture)
+})
+
+// Mount API routes with /api prefix
+app.route('/api', api)
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', async (c) => {
+  const url = new URL(c.req.url)
+  // Skip API routes and assets
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/assets')) {
+    return c.notFound()
+  }
+  // Serve index.html for SPA routes
+  url.pathname = '/index.html'
+  return c.env.ASSETS.fetch(new Request(url.toString(), { method: 'GET' }))
 })
 
 export default app

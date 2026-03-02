@@ -4,14 +4,15 @@
 
 ## Project Overview
 
-**FCollections** is a Cloudflare Workers + Hono web application that provides API endpoints and serves static assets.
+**FCollections** is a Cloudflare Workers + Hono web application with a React frontend built via Vite.
 
 ### Tech Stack
 
 | Component | Technology |
 |-----------|------------|
 | Runtime | Cloudflare Workers |
-| Framework | Hono v4 |
+| Backend Framework | Hono v4 |
+| Frontend Framework | React 19 + Vite 7 |
 | Language | TypeScript |
 | Package Manager | pnpm |
 | Deployment | Wrangler |
@@ -21,12 +22,21 @@
 ```
 fcollections/
 ├── src/
-│   └── index.ts          # Main Hono app with API routes
-├── public/               # Static assets served by Workers Assets binding
-├── wrangler.jsonc        # Cloudflare Workers configuration
+│   ├── index.ts          # Hono API routes
+│   └── client/           # React frontend
+│       ├── main.tsx      # React entry point
+│       ├── App.tsx       # Main app component
+│       └── index.css     # Global styles
+├── public/               # Static assets and build output
+│   ├── index.html        # HTML entry point
+│   ├── assets/           # Built JS/CSS (from Vite)
+│   ├── cover.png
+│   └── vite.svg
+├── wrangler.jsonc        # Cloudflare Workers config
+├── vite.config.ts        # Vite configuration
 ├── eslint.config.js      # ESLint flat config
 ├── .prettierrc.js        # Prettier configuration
-└── package.json          # Dependencies and scripts
+└── package.json
 ```
 
 ### Current API Endpoints
@@ -57,29 +67,40 @@ type Bindings = CloudflareBindings & {
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Start local development server (Wrangler) |
-| `pnpm deploy` | Deploy to Cloudflare Workers |
+| `pnpm dev` | Start Cloudflare Workers dev server (port 8787) |
+| `pnpm dev:client` | Start Vite dev server (port 5173) |
+| `pnpm build` | Build frontend with Vite (outputs to public/) |
+| `pnpm deploy` | Build and deploy to Cloudflare Workers |
 | `pnpm lint` | Run ESLint |
 | `pnpm lint:fix` | Fix ESLint issues automatically |
 | `pnpm format` | Format code with Prettier |
 | `pnpm cf-typegen` | Generate CloudflareBindings types |
 
+### Development Workflow
+
+1. **Backend Development**: `pnpm dev` - Wrangler serves both API and static assets
+2. **Frontend Development**: `pnpm dev:client` - Vite dev server with HMR and API proxy
+3. **Production Build**: `pnpm build` - Vite builds to public/assets
+4. **Deploy**: `pnpm deploy` - Builds and deploys to Cloudflare
+
 ### Architecture Decisions
 
-#### Frontend Architecture (Planned)
+#### Frontend Architecture (Implemented)
 
-**Chosen**: Vite + Hono Hybrid (方案2变体)
+**Vite + Hono Hybrid**
 
-- Frontend built with Vite (React/TSX)
-- Development: Separate Vite dev server for HMR
-- Production: Vite builds to `public/`, served by Workers Assets
-- API calls: Frontend calls `/api/*` endpoints on same domain
+- **Frontend**: React 19 with TypeScript, built via Vite
+- **Development**: Separate Vite dev server (localhost:5173) with HMR and API proxy to Workers
+- **Production**: Vite builds to `public/assets/`, served by Workers Assets binding
+- **API Integration**: Frontend calls backend endpoints directly on same domain
+- **SPA Fallback**: Hono serves index.html for all non-API routes
 
-#### Migration Notes
+#### Why This Architecture?
 
-- Currently using Hono as API-only
-- Frontend to be added in `src/client/` directory
-- Static builds will be output to `public/` directory
+1. **Developer Experience**: Vite provides instant HMR during development
+2. **Simple Deployment**: Single deploy command builds frontend and deploys Workers
+3. **Fast Performance**: Static assets served from Cloudflare's edge network
+4. **Easy Migration**: Frontend can be extracted to separate service if needed
 
 ### Important Notes
 
@@ -90,9 +111,16 @@ type Bindings = CloudflareBindings & {
 
 ### External Dependencies
 
+**Backend**:
 - **hono**: Web framework
-- **lru-cache**: In-memory caching
+- **lru-cache**: In-memory caching for Unsplash API
 - **unsplash-js**: Unsplash API client (installed but may not be actively used)
+
+**Frontend**:
+- **react**: UI framework
+- **react-dom**: React DOM renderer
+- **vite**: Build tool and dev server
+- **@vitejs/plugin-react**: Vite React plugin
 
 ---
 

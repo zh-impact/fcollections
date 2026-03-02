@@ -23,6 +23,12 @@ export default [
         Headers: 'readonly',
         crypto: 'readonly',
         CloudflareBindings: 'readonly',
+        // Browser globals for React
+        document: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
       },
     },
     plugins: {

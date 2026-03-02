@@ -17,6 +17,7 @@
     "lru-cache": "^11.2.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
     "unsplash-js": "^7.0.20"
   },
   "devDependencies": {

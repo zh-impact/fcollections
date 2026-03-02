@@ -13,6 +13,7 @@
 | Runtime | Cloudflare Workers |
 | Backend Framework | Hono v4 |
 | Frontend Framework | React 19 + Vite 7 |
+| Routing | react-router-dom v7 (HashRouter) |
 | Language | TypeScript |
 | Package Manager | pnpm |
 | Deployment | Wrangler |
@@ -24,14 +25,19 @@ fcollections/
 ├── src/
 │   ├── index.ts          # Hono API routes
 │   └── client/           # React frontend
-│       ├── main.tsx      # React entry point
-│       ├── App.tsx       # Main app component
+│       ├── main.tsx      # React entry point (HashRouter)
+│       ├── App.tsx       # Main app with Routes
+│       ├── pages/        # Page components
+│       │   ├── Home.tsx
+│       │   ├── DailyPicture.tsx
+│       │   └── DailyPicture.css
 │       └── index.css     # Global styles
 ├── public/               # Static assets and build output
 │   ├── index.html        # HTML entry point
 │   ├── assets/           # Built JS/CSS (from Vite)
 │   ├── cover.png
 │   └── vite.svg
+├── static/               # Static assets (copied to public/ on build)
 ├── wrangler.jsonc        # Cloudflare Workers config
 ├── vite.config.ts        # Vite configuration
 ├── eslint.config.js      # ESLint flat config
@@ -43,9 +49,17 @@ fcollections/
 
 | Route | Method | Description |
 |-------|--------|-------------|
-| `/message` | GET | Returns "Hello Hono!" text |
-| `/cover` | GET | Proxies cover.png from static assets |
-| `/random/picture` | GET | Fetches random picture from Unsplash API (with LRU cache) |
+| `/api/message` | GET | Returns "Hello Hono!" text |
+| `/api/cover` | GET | Proxies cover.png from static assets |
+| `/api/random/picture` | GET | Fetches random picture from Unsplash API (with LRU cache) |
+| `/api/daily/picture` | GET | Searches Unsplash by keywords (with query params) |
+
+### Frontend Routes
+
+| Route | Component | Description |
+|-------|-----------|-------------|
+| `/` | Home | Main landing page with API test links |
+| `/daily-picture` | DailyPicture | Search Unsplash by keywords with grid display |
 
 ### Environment Bindings
 
@@ -119,6 +133,7 @@ type Bindings = CloudflareBindings & {
 **Frontend**:
 - **react**: UI framework
 - **react-dom**: React DOM renderer
+- **react-router-dom**: Client-side routing (HashRouter)
 - **vite**: Build tool and dev server
 - **@vitejs/plugin-react**: Vite React plugin
 

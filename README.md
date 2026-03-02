@@ -6,9 +6,10 @@
 
 - ⚡ **Cloudflare Workers** - Edge computing platform
 - 🔥 **Hono** - Fast, lightweight web framework
-- ⚛️ **React** - Modern UI library
+- ⚛️ **React** - Modern UI library with routing
 - 📦 **Vite** - Fast build tool with HMR
-- 🎨 **Unsplash Integration** - Random image API with caching
+- 🎨 **Unsplash Integration** - Random picture and daily picture search
+- 🔍 **Daily Picture** - Search Unsplash by keywords with caching
 - 🔧 **TypeScript** - Type-safe development
 - ✨ **Code Quality** - ESLint + Prettier configured
 
@@ -52,8 +53,11 @@ fcollections/
 │   ├── index.ts          # Hono API routes
 │   └── client/           # React frontend
 │       ├── main.tsx      # Entry point
-│       ├── App.tsx       # Main component
-│       └── index.css     # Styles
+│       ├── App.tsx       # Main component with routes
+│       ├── pages/        # Page components
+│       │   ├── Home.tsx
+│       │   └── DailyPicture.tsx
+│       └── index.css     # Global styles
 ├── static/               # Static assets (copied to public/ on build)
 │   ├── cover.png
 │   └── vite.svg
@@ -72,11 +76,30 @@ All API endpoints use `/api` prefix:
 | `/api/message` | GET | Returns greeting message |
 | `/api/cover` | GET | Serves cover image |
 | `/api/random/picture` | GET | Fetches random picture from Unsplash |
+| `/api/daily/picture` | GET | Searches Unsplash by keywords |
 
-### Example: Get Random Picture
+### Query Parameters for `/api/daily/picture`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `keywords` | string | Search keywords (optional, empty = random) |
+| `orientation` | string | Filter by orientation: landscape, portrait, squarish |
+| `count` | number | Number of pictures to return (1-30, default: 1) |
+
+### Examples
 
 ```bash
-curl https://your-worker.workers.dev/api/random/picture --output image.jpg
+# Get a random picture
+curl https://your-worker.workers.dev/api/daily/picture
+
+# Search for nature pictures
+curl https://your-worker.workers.dev/api/daily/picture?keywords=nature
+
+# Search with orientation filter
+curl https://your-worker.workers.dev/api/daily/picture?keywords=city&orientation=landscape
+
+# Get multiple pictures
+curl https://your-worker.workers.dev/api/daily/picture?keywords=cats&count=5
 ```
 
 ## Configuration
